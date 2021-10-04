@@ -72,8 +72,69 @@ namespace ClassLibrary.Encryptors
 
         public string DecryptString(string text, T Key)
         {
-            return "";
+            var height = Key.GetZigZagKey();
+            var mLenght = text.Length;
+            List<char>[] ArrayY = new List<char>[height];
+            bool flag = true;
+            for (int i = 0; i < height; i++)
+            {
+                ArrayY[i] = new List<char>();
+            }
+            int m = GetM(mLenght, height);
+            for (int j = 0; j < height; j++)
+            {
+                if (j == 0 || j == height - 1)
+                {
+                    for (int k = 0; k < m; k++)
+                    {
+                        ArrayY[j].Add(text[0]);
+                        text = text.Remove(0, 1);
+                    }
+                }
+                else
+                {
+                    for (int k = 0; k < (2 * m); k++)
+                    {
+                        ArrayY[j].Add(text[0]);
+                        text = text.Remove(0, 1);
+                    }
+                }
+            }
+            while (flag)
+            {
+                for (int i = 0; i < height - 1; i++)
+                {
+                    if (ArrayY[i][0].Equals('$'))
+                    {
+                        flag = false;
+                    }
+                    else
+                    {
+                        decrypted += ArrayY[i][0];
+                        ArrayY[i].RemoveAt(0);
+                    }
+                }
+                for (int j = height - 1; j > 0; j--)
+                {
+                    if (ArrayY[j][0].Equals('$'))
+                    {
+                        flag = false;
+                    }
+                    else
+                    {
+                        decrypted += ArrayY[j][0];
+                        ArrayY[j].RemoveAt(0);
+                    }
+                }
+            }
+            return decrypted;
         }
 
+        // Metodo ayuda para obtener la cantidad de valores altos y bajos
+        public int GetM(int mLenght, int height)
+        {
+            int m = (mLenght / (2 + 2 * (height - 2)));
+            return m;
+        }
     }
 }
