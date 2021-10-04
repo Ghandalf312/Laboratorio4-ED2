@@ -14,7 +14,7 @@ using System.Security.Cryptography;
 
 namespace ClassLibrary.Encryptors
 {
-    class CrypCesar<T>  where T : IKeyHolder
+    class CrypCesar<T>  : IEncryptor<T> where T : IKeyHolder
     {
         #region Variables
         Dictionary<byte, byte> CesarDictionary = new Dictionary<byte, byte>();
@@ -115,6 +115,45 @@ namespace ClassLibrary.Encryptors
             }
             return encryptedString;
         }
+
+
+        /// <summary>
+        public string EncryptFile(string savingPath, string completeFilePath, T key)
+        {
+            CesarDictionary.Clear();
+            using var fileForReading = new FileStream(completeFilePath, FileMode.Open);
+            using var reader = new BinaryReader(fileForReading);
+            var buffer = new byte[2000];
+            LoadDictionary(key, true);
+            var fileRoute = $"{savingPath}/{Path.GetFileNameWithoutExtension(completeFilePath) + ".csr"}";
+            using var fileForWriting = new FileStream(fileRoute, FileMode.OpenOrCreate);
+            using var writer = new BinaryWriter(fileForWriting);
+            while (fileForReading.Position != fileForReading.Length)
+            {
+                buffer = reader.ReadBytes(buffer.Length);
+                foreach (var character in buffer)
+                {
+                    if (CesarDictionary.ContainsKey(character))
+                    {
+                        writer.Write(CesarDictionary[character]);
+                    }
+                    else
+                    {
+                        writer.Write(character);
+                    }
+                }
+            }
+            reader.Close();
+            fileForReading.Close();
+            writer.Close();
+            fileForWriting.Close();
+            return fileRoute;
+        }
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+
         #endregion
 
 
@@ -138,6 +177,40 @@ namespace ClassLibrary.Encryptors
             }
             return decryptedString;
         }
+        /// <summary>
+        /// <returns></returns>
+        public string DecryptFile(string savingPath, string completeFilePath, T key)
+        {
+            CesarDictionary.Clear();
+            using var fileForReading = new FileStream(completeFilePath, FileMode.Open);
+            using var reader = new BinaryReader(fileForReading);
+            var buffer = new byte[2000];
+            LoadDictionary(key, false);
+            var fileRoute = $"{savingPath}/{Path.GetFileNameWithoutExtension(completeFilePath) + ".txt"}";
+            using var fileforWriting = new FileStream(fileRoute, FileMode.OpenOrCreate);
+            using var writer = new BinaryWriter(fileforWriting);
+            while (fileForReading.Position != fileForReading.Length)
+            {
+                buffer = reader.ReadBytes(buffer.Length);
+                foreach (var character in buffer)
+                {
+                    if (CesarDictionary.ContainsKey(character))
+                    {
+                        writer.Write(CesarDictionary[character]);
+                    }
+                    else
+                    {
+                        writer.Write(character);
+                    }
+                }
+            }
+            reader.Close();
+            fileForReading.Close();
+            writer.Close();
+            fileforWriting.Close();
+            return fileRoute;
+        }
+
         #endregion
     }
 }
