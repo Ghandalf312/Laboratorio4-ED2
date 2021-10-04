@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EncryptionTest
+namespace CryptoTest
 {
     class Program
     {
