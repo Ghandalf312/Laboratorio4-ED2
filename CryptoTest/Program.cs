@@ -2,6 +2,7 @@
 using System.Threading;
 using API.Models;
 using ClassLibrary.Encryptors;
+
 namespace CryptoTest
 {
     class Program
@@ -61,7 +62,6 @@ namespace CryptoTest
             Console.WriteLine("Los tipos de cifrado que puede escoger son cesar, zigzag y ruta");
             Console.WriteLine("La llave del cifrado Cesar debe contener solamente letras del abecedario inglés");
             Console.WriteLine("La llave del cifrado Zigzag debe ser un número mayor a 0");
-            Console.WriteLine("La llave del cifrado ruta debe estar en formato MxN donde M y N son números mayores a 0");
             Console.ReadLine();
             Console.Clear();
         }

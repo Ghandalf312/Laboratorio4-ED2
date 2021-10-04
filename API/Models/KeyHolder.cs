@@ -1,11 +1,10 @@
-﻿using System;
+﻿using ClassLibrary.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using ClassLibrary.Interfaces;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.Xml;
+using System.Threading.Tasks;
 
 
 namespace API.Models
