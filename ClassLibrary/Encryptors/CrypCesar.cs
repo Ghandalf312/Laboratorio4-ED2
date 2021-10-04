@@ -14,7 +14,7 @@ using System.Security.Cryptography;
 
 namespace ClassLibrary.Encryptors
 {
-    class CrypCesar<T>  : IEncryptor<T> where T : IKeyHolder
+    public class CrypCesar<T>  : IEncryptor<T> where T : IKeyHolder
     {
         #region Variables
         Dictionary<byte, byte> CesarDictionary = new Dictionary<byte, byte>();
@@ -97,27 +97,6 @@ namespace ClassLibrary.Encryptors
         #endregion
 
         #region Encryption
-        public string EncryptString(string text, T key)
-        {
-            CesarDictionary.Clear();
-            var encryptedString = string.Empty;
-            LoadDictionary(key, true);
-            foreach (var character in text)
-            {
-                if (CesarDictionary.ContainsKey((byte)character))
-                {
-                    encryptedString += (char)CesarDictionary[(byte)character];
-                }
-                else
-                {
-                    encryptedString += (char)character;
-                }
-            }
-            return encryptedString;
-        }
-
-
-        /// <summary>
         public string EncryptFile(string savingPath, string completeFilePath, T key)
         {
             CesarDictionary.Clear();
@@ -149,36 +128,28 @@ namespace ClassLibrary.Encryptors
             fileForWriting.Close();
             return fileRoute;
         }
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
 
-        #endregion
-
-
-        #region Decryption
-
-        public string DecryptString(string text, T key)
+        public string EncryptString(string text, T key)
         {
             CesarDictionary.Clear();
-            var decryptedString = string.Empty;
-            LoadDictionary(key, false);
+            var encryptedString = string.Empty;
+            LoadDictionary(key, true);
             foreach (var character in text)
             {
                 if (CesarDictionary.ContainsKey((byte)character))
                 {
-                    decryptedString += (char)CesarDictionary[(byte)character];
+                    encryptedString += (char)CesarDictionary[(byte)character];
                 }
                 else
                 {
-                    decryptedString += (char)character;
+                    encryptedString += (char)character;
                 }
             }
-            return decryptedString;
+            return encryptedString;
         }
-        /// <summary>
-        /// <returns></returns>
+        #endregion
+
+        #region Decryption
         public string DecryptFile(string savingPath, string completeFilePath, T key)
         {
             CesarDictionary.Clear();
@@ -211,6 +182,24 @@ namespace ClassLibrary.Encryptors
             return fileRoute;
         }
 
+        public string DecryptString(string text, T key)
+        {
+            CesarDictionary.Clear();
+            var decryptedString = string.Empty;
+            LoadDictionary(key, false);
+            foreach (var character in text)
+            {
+                if (CesarDictionary.ContainsKey((byte)character))
+                {
+                    decryptedString += (char)CesarDictionary[(byte)character];
+                }
+                else
+                {
+                    decryptedString += (char)character;
+                }
+            }
+            return decryptedString;
+        }
         #endregion
     }
 }
