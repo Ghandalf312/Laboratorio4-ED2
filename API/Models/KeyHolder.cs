@@ -13,10 +13,9 @@ namespace API.Models
     {
         public string Word { get; set; }
         public int Levels { get; set; }
-        public int Rows { get; set; }
-        public int Columns { get; set; }
 
         public string GetCesarKey() { return Word; }
+        public int GetZigZagKey() { return Levels; }
 
         public static bool CheckKeyValidness(string method, KeyHolder key)
         {

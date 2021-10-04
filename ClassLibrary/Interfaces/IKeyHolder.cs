@@ -7,5 +7,6 @@ namespace ClassLibrary.Interfaces
     public interface IKeyHolder 
     {
         string GetCesarKey();
+        int GetZigZagKey();
     }
 }
