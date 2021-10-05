@@ -7,11 +7,8 @@ namespace ClassLibrary.Encryptors
 {
     public class CrypCesar<T>  : IEncryptor<T> where T : IKeyHolder
     {
-        #region Variables
         Dictionary<byte, byte> CesarDictionary = new Dictionary<byte, byte>();
-        #endregion
 
-        #region DictionaryLoad
         private void LoadDictionary(T key, bool encryption)
         {
             var keyValue = key.GetCesarKey();
@@ -28,7 +25,6 @@ namespace ClassLibrary.Encryptors
                 FillDictionary(keyValue.ToLower(), false, lowerCharacters);
             }
         }
-
         private void FillDictionary(string key, bool encryption, List<byte> letterList)
         {
             var characterList = letterList;
@@ -85,9 +81,7 @@ namespace ClassLibrary.Encryptors
                 }
             }
         }
-        #endregion
 
-        #region Encryption
         public string EncryptFile(string savingPath, string completeFilePath, T key)
         {
             CesarDictionary.Clear();
@@ -119,7 +113,6 @@ namespace ClassLibrary.Encryptors
             fileForWriting.Close();
             return fileRoute;
         }
-
         public string EncryptString(string text, T key)
         {
             CesarDictionary.Clear();
@@ -138,9 +131,7 @@ namespace ClassLibrary.Encryptors
             }
             return encryptedString;
         }
-        #endregion
 
-        #region Decryption
         public string DecryptFile(string savingPath, string completeFilePath, T key)
         {
             CesarDictionary.Clear();
@@ -172,7 +163,6 @@ namespace ClassLibrary.Encryptors
             fileforWriting.Close();
             return fileRoute;
         }
-
         public string DecryptString(string text, T key)
         {
             CesarDictionary.Clear();
@@ -191,6 +181,5 @@ namespace ClassLibrary.Encryptors
             }
             return decryptedString;
         }
-        #endregion
     }
 }

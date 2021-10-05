@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using ClassLibrary.Interfaces;
+using System.IO;
 
 namespace ClassLibrary.Encryptors
 {
@@ -15,7 +16,78 @@ namespace ClassLibrary.Encryptors
         public CrypZigZag() { }
         public string EncryptFile(string savingPath, string completeFilePath, T key)
         {
-            return "";
+            var height = key.GetZigZagKey();
+            var fillingByte = Convert.ToByte(Fillingchar);
+            List<byte>[] arrayY = new List<byte>[height];
+            int k = 0;
+            using var fileForReading = new FileStream(completeFilePath, FileMode.Open);
+            using var reader = new BinaryReader(fileForReading);
+            var buffer = new byte[2000];
+            var fileRoute = $"{savingPath}/{Path.GetFileNameWithoutExtension(completeFilePath) + ".zz"}";
+            using var fileForWriting = new FileStream(fileRoute, FileMode.OpenOrCreate);
+            using var writer = new BinaryWriter(fileForWriting);
+            for (int i = 0; i < height; i++)
+            {
+                arrayY[i] = new List<byte>();
+            }
+            while (fileForReading.Position != fileForReading.Length)
+            {
+                k = 0;
+                buffer = reader.ReadBytes(buffer.Length);
+                while (k < buffer.Length)
+                {
+                    for (int i = 0; i < height - 1; i++)
+                    {
+                        if (k < buffer.Length)
+                        {
+                            arrayY[i].Add(buffer[k]);
+                            k++;
+                        }
+                        else if (!(fileForReading.Position != fileForReading.Length))
+                        {
+                            arrayY[i].Add(fillingByte);
+                        }
+                        else
+                        {
+                            k = 0;
+                            buffer = reader.ReadBytes(buffer.Length);
+                            arrayY[i].Add(buffer[k]);
+                            k++;
+                        }
+                    }
+                    for (int j = height - 1; j > 0; j--)
+                    {
+                        if (k < buffer.Length)
+                        {
+                            arrayY[j].Add(buffer[k]);
+                            k++;
+                        }
+                        else if (!(fileForReading.Position != fileForReading.Length))
+                        {
+                            arrayY[j].Add(fillingByte);
+                        }
+                        else
+                        {
+                            k = 0;
+                            buffer = reader.ReadBytes(buffer.Length);
+                            arrayY[j].Add(buffer[k]);
+                            k++;
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < height; i++)
+            {
+                foreach (var item in arrayY[i])
+                {
+                    writer.Write(item);
+                }
+            }
+            reader.Close();
+            fileForReading.Close();
+            writer.Close();
+            fileForWriting.Close();
+            return fileRoute;
         }
 
         public string EncryptString(string text, T Key)
@@ -67,7 +139,112 @@ namespace ClassLibrary.Encryptors
 
         public string DecryptFile(string savingPath, string completeFilePath, T key)
         {
-            return "";
+            var height = key.GetZigZagKey();
+            List<byte>[] arrayY = new List<byte>[height];
+            int n = 0;
+            using var fileForReading = new FileStream(completeFilePath, FileMode.Open);
+            using var reader = new BinaryReader(fileForReading);
+            var buffer = new byte[2000];
+            var fileRoute = $"{savingPath}/{Path.GetFileNameWithoutExtension(completeFilePath) + ".txt"}";
+            using var fileForWriting = new FileStream(fileRoute, FileMode.OpenOrCreate);
+            using var writer = new BinaryWriter(fileForWriting);
+            for (int i = 0; i < height; i++)
+            {
+                arrayY[i] = new List<byte>();
+            }
+            while (fileForReading.Position != fileForReading.Length)
+            {
+                buffer = reader.ReadBytes(buffer.Length);
+                bool flag = true;
+                int m = GetM(Convert.ToInt32(fileForReading.Length), height);
+                for (int j = 0; j < height; j++)
+                {
+                    if (j == 0 || j == height - 1)
+                    {
+                        for (int k = 0; k < m; k++)
+                        {
+                            if (n < buffer.Length)
+                            {
+                                arrayY[j].Add(buffer[n]);
+                                n++;
+                            }
+                            else
+                            {
+                                n = 0;
+                                buffer = reader.ReadBytes(buffer.Length);
+                                arrayY[j].Add(buffer[n]);
+                                n++;
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        for (int k = 0; k < (2 * m); k++)
+                        {
+                            if (n < buffer.Length)
+                            {
+                                arrayY[j].Add(buffer[n]);
+                                n++;
+                            }
+                            else
+                            {
+                                n = 0;
+                                buffer = reader.ReadBytes(buffer.Length);
+                                arrayY[j].Add(buffer[n]);
+                                n++;
+                            }
+                        }
+                    }
+                }
+                while (flag)
+                {
+                    for (int i = 0; i < height - 1; i++)
+                    {
+                        if (arrayY[i].Count != 0)
+                        {
+                            if (arrayY[i][0].Equals(Convert.ToByte('*')))
+                            {
+                                flag = false;
+                            }
+                            else
+                            {
+                                writer.Write(arrayY[i][0]);
+                                arrayY[i].RemoveAt(0);
+                            }
+                        }
+                        else
+                        {
+                            flag = false;
+                        }
+                    }
+                    for (int j = height - 1; j > 0; j--)
+                    {
+                        if (arrayY[j].Count != 0)
+                        {
+                            if (arrayY[j][0].Equals(Convert.ToByte('*')))
+                            {
+                                flag = false;
+                            }
+                            else
+                            {
+                                writer.Write(arrayY[j][0]);
+                                arrayY[j].RemoveAt(0);
+                            }
+                        }
+                        else
+                        {
+                            flag = false;
+                        }
+                    }
+                }
+
+            }
+            reader.Close();
+            fileForReading.Close();
+            writer.Close();
+            fileForWriting.Close();
+            return fileRoute;
         }
 
         public string DecryptString(string text, T Key)
