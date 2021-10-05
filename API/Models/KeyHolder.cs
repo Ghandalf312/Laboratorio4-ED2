@@ -61,6 +61,12 @@ namespace API.Models
                         }
                     }
                     break;
+                case ".zz":
+                    if (key.Levels <= 0)
+                    {
+                        return false;
+                    }
+                    break;
             }
             return true;
         }

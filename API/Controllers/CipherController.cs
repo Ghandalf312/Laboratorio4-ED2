@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class CipherController : ControllerBase
     {
@@ -23,14 +23,14 @@ namespace API.Controllers
         }
 
         // GET: api/<CipherController>
-        [Route("/cipher")]
+        [Route("cipher")]
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        [Route("/api/cipher/{method}")]
+        [Route("cipher/{method}")]
         [HttpPost]
         public async Task<IActionResult> Cipher([FromForm] IFormFile file, string method, [FromForm] KeyHolder key)
         {
@@ -50,7 +50,7 @@ namespace API.Controllers
             }
         }
 
-        [Route("/api/decipher")]
+        [Route("decipher")]
         [HttpPost]
         public async Task<IActionResult> Decipher([FromForm] IFormFile file, [FromForm] KeyHolder key)
         {

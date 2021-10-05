@@ -39,6 +39,11 @@ namespace API.Models
                     encryptedFileProperties.Path = cesarEncryptor.EncryptFile(savingPath, filePath, key);
                     encryptedFileProperties.FileType = ".csr";
                     break;
+                case "zigzag":
+                    var zigzagEncryptor = new CrypZigZag<KeyHolder>();
+                    encryptedFileProperties.Path = zigzagEncryptor.EncryptFile(savingPath, filePath, key);
+                    encryptedFileProperties.FileType = ".zz";
+                    break;
             }
             return encryptedFileProperties;
         }
@@ -56,6 +61,9 @@ namespace API.Models
                 case ".csr":
                     var cesarDecryptor = new CrypCesar<KeyHolder>();
                     return cesarDecryptor.DecryptFile(savingPath, filePath, key);
+                case ".zz":
+                    var zigzagDecryptor = new CrypZigZag<KeyHolder>();
+                    return zigzagDecryptor.DecryptFile(savingPath, filePath, key);
             }
             return string.Empty;
         }
