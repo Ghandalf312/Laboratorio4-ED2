@@ -34,6 +34,12 @@ namespace API.Models
                         }
                     }
                     break;
+                case "zigzag":
+                    if (key.Levels <= 0)
+                    {
+                        return false;
+                    }
+                    break;
             }
             return true;
         }
@@ -65,6 +71,9 @@ namespace API.Models
             {
                 case "cesar":
                     Word = key;
+                    return CheckKeyValidness(method.ToLower(), this);
+                case "zigzag":
+                    Levels = Convert.ToInt32(key);
                     return CheckKeyValidness(method.ToLower(), this);
                 default:
                     return false;
