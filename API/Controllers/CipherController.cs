@@ -32,7 +32,7 @@ namespace API.Controllers
 
         [Route("cipher/{method}")]
         [HttpPost]
-        public async Task<IActionResult> Cipher([FromForm] IFormFile file, string method, [FromForm] KeyHolder key)
+        public async Task<IActionResult> Cipher([FromForm] IFormFile file, string method, [FromForm]KeyHolder key)
         {
             try
             {
