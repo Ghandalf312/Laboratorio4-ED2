@@ -81,7 +81,6 @@ namespace ClassLibrary.Encryptors
                 }
             }
         }
-
         public string EncryptFile(string savingPath, string completeFilePath, T key)
         {
             CesarDictionary.Clear();
@@ -131,7 +130,6 @@ namespace ClassLibrary.Encryptors
             }
             return encryptedString;
         }
-
         public string DecryptFile(string savingPath, string completeFilePath, T key)
         {
             CesarDictionary.Clear();

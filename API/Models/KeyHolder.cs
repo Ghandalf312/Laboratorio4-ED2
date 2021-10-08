@@ -13,9 +13,11 @@ namespace API.Models
     {
         public string Word { get; set; }
         public int Levels { get; set; }
+        public int Number { get; set; }
 
         public string GetCesarKey() { return Word; }
         public int GetZigZagKey() { return Levels; }
+        public int GetSDESKey() { return Number; }
 
         public static bool CheckKeyValidness(string method, KeyHolder key)
         {
@@ -36,6 +38,12 @@ namespace API.Models
                     break;
                 case "zigzag":
                     if (key.Levels <= 0)
+                    {
+                        return false;
+                    }
+                    break;
+                case "sdes":
+                    if (key.Number <= 0 || key.Number >= 1023)
                     {
                         return false;
                     }
@@ -67,6 +75,12 @@ namespace API.Models
                         return false;
                     }
                     break;
+                case ".sdes":
+                    if (key.Number <= 0 || key.Number >= 1023)
+                    {
+                        return false;
+                    }
+                    break;
             }
             return true;
         }
@@ -80,6 +94,9 @@ namespace API.Models
                     return CheckKeyValidness(method.ToLower(), this);
                 case "zigzag":
                     Levels = Convert.ToInt32(key);
+                    return CheckKeyValidness(method.ToLower(), this);
+                case "sdes":
+                    Number = Convert.ToInt32(key);
                     return CheckKeyValidness(method.ToLower(), this);
                 default:
                     return false;

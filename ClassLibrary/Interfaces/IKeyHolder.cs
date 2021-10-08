@@ -8,5 +8,6 @@ namespace ClassLibrary.Interfaces
     {
         string GetCesarKey();
         int GetZigZagKey();
+        int GetSDESKey();
     }
 }

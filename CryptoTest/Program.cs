@@ -59,9 +59,10 @@ namespace CryptoTest
         static void HandleError()
         {
             Console.WriteLine("Inserte un string válido");
-            Console.WriteLine("Los tipos de cifrado que puede escoger son cesar y zigzag");
+            Console.WriteLine("Los tipos de cifrado que puede escoger son cesar, zigzag y SDES");
             Console.WriteLine("La llave del cifrado Cesar debe contener solamente letras del abecedario inglés");
             Console.WriteLine("La llave del cifrado Zigzag debe ser un número mayor a 0");
+            Console.WriteLine("La llave del cifrado SDES debe ser un número mayor a 0 pero menor a 1023");
             Console.ReadLine();
             Console.Clear();
         }
@@ -80,6 +81,11 @@ namespace CryptoTest
                     case "zigzag":
                         var zigzagEncryptor = new CrypZigZag<KeyHolder>();
                         CompressedText = zigzagEncryptor.EncryptString(text, key);
+                        Console.WriteLine(CompressedText);
+                        return true;
+                    case "sdes":
+                        var SDESEncryptor = new SDES<KeyHolder>();
+                        CompressedText = SDESEncryptor.EncryptString(text, key);
                         Console.WriteLine(CompressedText);
                         return true;
                     default:
@@ -105,6 +111,10 @@ namespace CryptoTest
                     case "zigzag":
                         var zigzagEncryptor = new CrypZigZag<KeyHolder>();
                         Console.WriteLine(zigzagEncryptor.DecryptString(CompressedText, key));
+                        return true;
+                    case "sdes":
+                        var SDESEncryptor = new SDES<KeyHolder>();
+                        Console.WriteLine(SDESEncryptor.DecryptString(CompressedText, key));
                         return true;
                     default:
                         return false;
