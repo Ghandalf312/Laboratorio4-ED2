@@ -21,7 +21,9 @@ namespace ClassLibrary.Encryptors
 
         public string DecryptString(string text, T Key)
         {
-            return "";
+            var key = Key.GetSDESKey();
+            var keys = GenerateKeys(key);
+            return ShowCipher(text, keys[1], keys[0]);
         }
 
         private static int[] GenerateKeys(int k)
