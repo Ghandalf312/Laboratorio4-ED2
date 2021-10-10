@@ -53,7 +53,7 @@ namespace API.Controllers
             }
         }
 
-        [Route("sdes/cipher")]
+        [Route("sdes/cipher/{name}")]
         [HttpPost]
         public FileResult CipherSDES([FromForm] IFormFile file, string name, [FromForm] KeyHolder key)
         {
@@ -64,18 +64,24 @@ namespace API.Controllers
                 {
                     return null;
                 }
-                var originalFileName = file.FileName.Split(".");
-                string originalName = originalFileName[0];
+                int i = 1;
+                var originalName = name;
+                while (System.IO.File.Exists($"{Environment.ContentRootPath}/{name}"))
+                {
+                    name = originalName + "(" + i.ToString() + ")";
+                    i++;
+                }
                 var reader = new StreamReader(file.OpenReadStream());
                 string text = reader.ReadToEnd();
                 reader.Close();
-
                 string cipher = sdes.EncryptString(text, key);
-
                 byte[] array = Encoding.UTF8.GetBytes(cipher);
 
-                return base.File(array, "Ciphers/sdes", originalName + ".sdes");
-
+                var cipherInfo = new Ciphers();
+                cipherInfo.SetAttributes(Environment.ContentRootPath, file.FileName, name);
+                Singleton.Instance.HistoryList.Add(cipherInfo);
+                return base.File(array, MediaTypeNames.Text.Plain, name + ".sdes");
+                //return PhysicalFile($"{Environment.ContentRootPath}/{name}", MediaTypeNames.Text.Plain, $"{name}.sdes");
             }
             catch
             {
@@ -116,7 +122,15 @@ namespace API.Controllers
                 {
                     return null;
                 }
-                var name = file.FileName.Split(".");
+                Ciphers.LoadHistList(Environment.ContentRootPath);
+                var name = "";
+                foreach (var item in Singleton.Instance.HistoryList)
+                {
+                    if (item.CompressedName == file.FileName.Substring(0, (file.FileName.Length) - 5))
+                    {
+                        name = item.OriginalName;
+                    }
+                }
                 using (var memory = new MemoryStream())
                 {
                     await file.CopyToAsync(memory);
@@ -126,7 +140,7 @@ namespace API.Controllers
                 var cipher = Encoding.UTF8.GetString(bytes);
                 var text = sdes.DecryptString(cipher, key);
                 byte[] array = Encoding.UTF8.GetBytes(text);
-                return base.File(array, "text/plain", name[0] + ".txt");
+                return base.File(array, MediaTypeNames.Text.Plain, (name.Substring(0, name.Length - 4)) + ".txt");
             }
             catch
             {
