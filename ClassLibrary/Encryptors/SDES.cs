@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ClassLibrary.Interfaces;
+using System.IO;
 
 namespace ClassLibrary.Encryptors
 {
@@ -9,6 +10,8 @@ namespace ClassLibrary.Encryptors
     {
         string EncryptString(string text, T Key);
         string DecryptString(string text, T Key);
+        string EncryptFile(string text, T Key);
+        string DecryptFile(string text, T Key);
     }
     public class SDES<T> : Encryptor<T> where T : IKeyHolder
     {
@@ -19,11 +22,25 @@ namespace ClassLibrary.Encryptors
             return ShowCipher(text, keys[0], keys[1]);
         }
 
+        public string EncryptFile(string text, T Key)
+        {
+            var key = Key.GetSDESKey();
+            var keys = GenerateKeysF(key);
+            return ShowCipherF(text, keys[0], keys[1]);
+        }
+
         public string DecryptString(string text, T Key)
         {
             var key = Key.GetSDESKey();
             var keys = GenerateKeys(key);
             return ShowCipher(text, keys[1], keys[0]);
+        }
+
+        public string DecryptFile(string text, T Key)
+        {
+            var key = Key.GetSDESKey();
+            var keys = GenerateKeysF(key);
+            return ShowCipherF(text, keys[1], keys[0]);
         }
 
         private static int[] GenerateKeys(int k)
@@ -40,6 +57,20 @@ namespace ClassLibrary.Encryptors
             return keys;
         }
 
+        private static int[] GenerateKeysF(int k)
+        {
+            var key = ConvertToBitArray(k, 10);
+            var p10 = P10F(key);
+            var left = Ci(DivideLeft(p10), 1);
+            var right = Ci(DivideRight(p10), 1);
+            var k1 = P8F(Merge(left, right));
+            var left2 = Ci(left, 2);
+            var right2 = Ci(right, 2);
+            var k2 = P8F(Merge(left2, right2));
+            int[] keys = { ConvertToInt(k1), ConvertToInt(k2) };
+            return keys;
+        }
+
         private static string ShowCipher(string text, int k1, int k2)
         {
             var content = ConvertToByteArray(text);
@@ -48,6 +79,17 @@ namespace ClassLibrary.Encryptors
             var key2 = ConvertToBitArray(k2, 8);
             for (int i = 0; i < content.Length; i++)
                 result[i] = CipherByte(ConvertToBitArray(content[i]), key1, key2);
+            return ConvertToString(result);
+        }
+
+        private static string ShowCipherF(string text, int k1, int k2)
+        {
+            var content = ConvertToByteArray(text);
+            var result = new byte[content.Length];
+            var key1 = ConvertToBitArray(k1, 8);
+            var key2 = ConvertToBitArray(k2, 8);
+            for (int i = 0; i < content.Length; i++)
+                result[i] = CipherByteF(ConvertToBitArray(content[i]), key1, key2);
             return ConvertToString(result);
         }
 
@@ -64,6 +106,18 @@ namespace ClassLibrary.Encryptors
             return ConvertToByte(final);
         }
 
+        private static byte CipherByteF(bool[] text, bool[] k1, bool[] k2)
+        {
+            var ip = PIF(text);
+            var left = DivideLeft(ip);
+            var right = DivideRight(ip);
+            var round1 = RoundF(right, k1);
+            var xor1 = Xor(left, round1);
+            var round2 = RoundF(xor1, k2);
+            var xor2 = Xor(right, round2);
+            var final = InvertedPIF(Merge(xor2, xor1));
+            return ConvertToByte(final);
+        }
         private static bool[] ConvertToBitArray(int n, int size)
         {
             bool[] aux = new bool[size];
@@ -145,41 +199,229 @@ namespace ClassLibrary.Encryptors
             return P4(Merge(left, right));
         }
 
+        private static bool[] RoundF(bool[] text, bool[] key)
+        {
+            var ep = EPF(text);
+            var xor = Xor(ep, key);
+            var left = S0(DivideLeft(xor));
+            var right = S1(DivideRight(xor));
+            return P4F(Merge(left, right));
+        }
+
+
         private static bool[] EP(bool[] item)
         {
-            bool[] aux = { item[3], item[1], item[2], item[0], item[1], item[0], item[3], item[2] };
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
             return aux;
         }
 
         private static bool[] PI(bool[] item)
         {
-            bool[] aux = { item[3], item[6], item[0], item[1], item[5], item[4], item[7], item[2] };
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
             return aux;
         }
 
         private static bool[] InvertedPI(bool[] item)
         {
-            bool[] aux = { item[2], item[3], item[7], item[0], item[5], item[4], item[1], item[6] };
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
             return aux;
         }
 
+
+        private static bool[] EPF(bool[] item)
+        {
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
+            return aux;
+        }
+
+        private static bool[] PIF(bool[] item)
+        {
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
+            return aux;
+        }
+
+        private static bool[] InvertedPIF(bool[] item)
+        {
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
+            return aux;
+        }
+
+
         private static bool[] P10(bool[] item)
         {
-            bool[] aux = { item[6], item[3], item[0], item[8], item[9], item[1], item[5], item[2], item[7], item[4] };
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1], item[(int.Parse(arrayConfig[8])) - 1], item[(int.Parse(arrayConfig[9])) - 1] };
             return aux;
         }
 
         private static bool[] P8(bool[] item)
         {
-            bool[] aux = { item[2], item[9], item[1], item[7], item[4], item[3], item[0], item[6] };
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
             return aux;
         }
 
         private static bool[] P4(bool[] item)
         {
-            bool[] aux = { item[2], item[1], item[3], item[0] };
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1] };
             return aux;
         }
+
+
+        private static bool[] P10F(bool[] item)
+        {
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1], item[(int.Parse(arrayConfig[8])) - 1], item[(int.Parse(arrayConfig[9])) - 1] };
+            return aux;
+        }
+
+        private static bool[] P8F(bool[] item)
+        {
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1], item[(int.Parse(arrayConfig[4])) - 1], item[(int.Parse(arrayConfig[5])) - 1], item[(int.Parse(arrayConfig[6])) - 1], item[(int.Parse(arrayConfig[7])) - 1] };
+            return aux;
+        }
+
+        private static bool[] P4F(bool[] item)
+        {
+            var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
+            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            string[] arrayConfig;
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            {
+                var text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                text = outputFile.ReadLine();
+                var stringArray = text.Split(",");
+                arrayConfig = stringArray;
+            }
+            bool[] aux = { item[(int.Parse(arrayConfig[0])) - 1], item[(int.Parse(arrayConfig[1])) - 1], item[(int.Parse(arrayConfig[2])) - 1], item[(int.Parse(arrayConfig[3])) - 1] };
+            return aux;
+        }
+
 
         private static bool[] S0(bool[] item)
         {

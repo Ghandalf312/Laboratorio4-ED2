@@ -66,7 +66,8 @@ namespace API.Controllers
                 }
                 int i = 1;
                 var originalName = name;
-                while (System.IO.File.Exists($"{Environment.ContentRootPath}/{name}"))
+                
+                while (System.IO.File.Exists($"{Environment.ContentRootPath}/{name}" + ".sdes"))
                 {
                     name = originalName + "(" + i.ToString() + ")";
                     i++;
@@ -74,14 +75,12 @@ namespace API.Controllers
                 var reader = new StreamReader(file.OpenReadStream());
                 string text = reader.ReadToEnd();
                 reader.Close();
-                string cipher = sdes.EncryptString(text, key);
+                string cipher = sdes.EncryptFile(text, key);
                 byte[] array = Encoding.UTF8.GetBytes(cipher);
-
                 var cipherInfo = new Ciphers();
                 cipherInfo.SetAttributes(Environment.ContentRootPath, file.FileName, name);
                 Singleton.Instance.HistoryList.Add(cipherInfo);
                 return base.File(array, MediaTypeNames.Text.Plain, name + ".sdes");
-                //return PhysicalFile($"{Environment.ContentRootPath}/{name}", MediaTypeNames.Text.Plain, $"{name}.sdes");
             }
             catch
             {
@@ -138,7 +137,7 @@ namespace API.Controllers
                     List<byte> aux = bytes.OfType<byte>().ToList();
                 }
                 var cipher = Encoding.UTF8.GetString(bytes);
-                var text = sdes.DecryptString(cipher, key);
+                var text = sdes.DecryptFile(cipher, key);
                 byte[] array = Encoding.UTF8.GetBytes(text);
                 return base.File(array, MediaTypeNames.Text.Plain, (name.Substring(0, name.Length - 4)) + ".txt");
             }
