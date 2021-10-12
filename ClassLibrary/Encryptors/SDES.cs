@@ -212,9 +212,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] EP(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -230,9 +230,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] PI(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -249,9 +249,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] InvertedPI(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -270,9 +270,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] EPF(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -288,9 +288,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] PIF(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -307,9 +307,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] InvertedPIF(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -328,9 +328,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] P10(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 var stringArray = text.Split(",");
@@ -343,9 +343,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] P8(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -359,9 +359,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] P4(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -377,9 +377,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] P10F(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 var stringArray = text.Split(",");
@@ -392,9 +392,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] P8F(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
@@ -408,9 +408,9 @@ namespace ClassLibrary.Encryptors
         private static bool[] P4F(bool[] item)
         {
             var workingDirectory = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "..\\"));
-            workingDirectory = workingDirectory + "ClassLibrary\\Encryptors";
+            workingDirectory = workingDirectory + "API";
             string[] arrayConfig;
-            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\SDESConfig.txt"))
+            using (StreamReader outputFile = new StreamReader(workingDirectory + "\\Permutations.txt"))
             {
                 var text = outputFile.ReadLine();
                 text = outputFile.ReadLine();
