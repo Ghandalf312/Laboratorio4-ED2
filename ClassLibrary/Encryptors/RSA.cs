@@ -22,6 +22,26 @@ namespace ClassLibrary.Encryptors
             return "";
         }
 
+        public string EncryptString(string text, int n, int x)
+        {
+            return ConvertToString(EncryptString(ConvertToIntList(ConvertToByteArray(text), n), n, x));
+        }
+
+        private byte[] EncryptString(List<int> text, int n, int x)
+        {
+            List<int> rsa = new List<int>();
+            foreach (var item in text)
+            {
+                int aux = 1;
+                for (int i = 0; i < x; i++)
+                {
+                    aux *= item;
+                    aux %= n;
+                }
+                rsa.Add(aux);
+            }
+            return ConvertToByteArray(rsa, n);
+        }
         public int N(int p, int q)
         {
             return p * q;
