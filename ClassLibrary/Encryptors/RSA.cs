@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using ClassLibrary.Helpers;
+using ClassLibrary.Interfaces;
+using System.IO;
+using System.IO.Compression;
 using System.Numerics;
+using System.Text;
 
-namespace ClassLibrary.Encryptors
+namespace ClassLibrary.Encryptors : IEncryptotRSa
 {
     public interface IEncryptor
     {
