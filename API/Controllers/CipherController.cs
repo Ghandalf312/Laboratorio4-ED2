@@ -13,32 +13,148 @@ using System.Threading.Tasks;
 using ClassLibrary.Encryptors;
 using ClassLibrary.Helpers;
 
-namespace api.Controllers
+namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
-    public class EncryptorController : ControllerBase
+    public class CipherController : ControllerBase
     {
-        readonly IWebHostEnvironment env;
+        private IWebHostEnvironment Environment;
 
-        public EncryptorController(IWebHostEnvironment _env)
+        public CipherController(IWebHostEnvironment env)
         {
-            env = _env;
+            Environment = env;
+        }
+
+        // GET: api/<CipherController>
+        [Route("cipher")]
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            return new string[] { "value1", "value2" };
+        }
+
+        [Route("cipher/{method}")]
+        [HttpPost]
+        public async Task<IActionResult> Cipher([FromForm] IFormFile file, string method, [FromForm] KeyHolder key)
+        {
+            try
+            {
+                var uploadedFilePath = await FileManager.SaveFileAsync(file, Environment.ContentRootPath);
+                if (!KeyHolder.CheckKeyValidness(method, key))
+                {
+                    return StatusCode(500, "La llave ingresada es incorrecta");
+                }
+                var returningFile = FileManager.Cipher(Environment.ContentRootPath, uploadedFilePath, method, key);
+                return PhysicalFile(returningFile.Path, MediaTypeNames.Text.Plain, $"{Path.GetFileNameWithoutExtension(uploadedFilePath)}{returningFile.FileType}");
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [Route("sdes/cipher/{name}")]
+        [HttpPost]
+        public FileResult CipherSDES([FromForm] IFormFile file, string name, [FromForm] KeyHolder key)
+        {
+            try
+            {
+                var sdes = new SDES<KeyHolder>();
+                if (!KeyHolder.CheckKeyValidness("sdes", key))
+                {
+                    return null;
+                }
+                int i = 1;
+                var originalName = name;
+
+                while (System.IO.File.Exists($"{Environment.ContentRootPath}/{name}" + ".sdes"))
+                {
+                    name = originalName + "(" + i.ToString() + ")";
+                    i++;
+                }
+                var reader = new StreamReader(file.OpenReadStream());
+                string text = reader.ReadToEnd();
+                reader.Close();
+                string cipher = sdes.EncryptFile(text, key);
+                byte[] array = Encoding.UTF8.GetBytes(cipher);
+                var cipherInfo = new Ciphers();
+                cipherInfo.SetAttributes(Environment.ContentRootPath, file.FileName, name);
+                Singleton.Instance.HistoryList.Add(cipherInfo);
+                return base.File(array, MediaTypeNames.Text.Plain, name + ".sdes");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        [Route("decipher")]
+        [HttpPost]
+        public async Task<IActionResult> Decipher([FromForm] IFormFile file, [FromForm] KeyHolder key)
+        {
+            try
+            {
+                var uploadedFilePath = await FileManager.SaveFileAsync(file, Environment.ContentRootPath);
+                if (!KeyHolder.CheckKeyFromFileType(uploadedFilePath, key))
+                {
+                    return StatusCode(500, "La llave ingresada es incorrecta");
+                }
+                var returningFile = FileManager.Decipher(Environment.ContentRootPath, uploadedFilePath, key);
+                return PhysicalFile(returningFile, MediaTypeNames.Text.Plain);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [Route("sdes/decipher")]
+        [HttpPost]
+        public async Task<FileResult> DecipherSDES([FromForm] IFormFile file, [FromForm] KeyHolder key)
+        {
+            try
+            {
+                byte[] bytes;
+                var sdes = new SDES<KeyHolder>();
+
+                if (!KeyHolder.CheckKeyFromFileType(".sdes", key))
+                {
+                    return null;
+                }
+                Ciphers.LoadHistList(Environment.ContentRootPath);
+                var name = "";
+                foreach (var item in Singleton.Instance.HistoryList)
+                {
+                    if (item.CompressedName == file.FileName.Substring(0, (file.FileName.Length) - 5))
+                    {
+                        name = item.OriginalName;
+                    }
+                }
+                using (var memory = new MemoryStream())
+                {
+                    await file.CopyToAsync(memory);
+                    bytes = memory.ToArray();
+                    List<byte> aux = bytes.OfType<byte>().ToList();
+                }
+                var cipher = Encoding.UTF8.GetString(bytes);
+                var text = sdes.DecryptFile(cipher, key);
+                byte[] array = Encoding.UTF8.GetBytes(text);
+                return base.File(array, MediaTypeNames.Text.Plain, (name.Substring(0, name.Length - 4)) + ".txt");
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         [HttpGet]
-        public IActionResult Get()
-        {
-            return NoContent();
-        }
-
-        [HttpGet]
-        [Route("/api/rsa/keys/{p}/{q}")]
+        [Route("rsa/keys/{p}/{q}")]
         public IActionResult GenerateKeys(int p, int q)
         {
             try
             {
-                var encryptor = new RSA(env.ContentRootPath);
+                var encryptor = new RSA(Environment.ContentRootPath);
                 string path = encryptor.GenerateKeys(p, q);
                 if (path != "")
                 {
@@ -55,14 +171,14 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("/api/rsa/{nombre}")]
+        [Route("rsa/{nombre}")]
         public IActionResult Cipher([FromForm] IFormFile file, [FromForm] IFormFile key, string nombre)
         {
             try
             {
                 if (key.FileName.Substring(key.FileName.LastIndexOf('.')) == ".key")
                 {
-                    string path = env.ContentRootPath + "\\" + file.FileName;
+                    string path = Environment.ContentRootPath + "\\" + file.FileName;
                     using var saver = new FileStream(path, FileMode.Create);
                     file.CopyTo(saver);
                     saver.Close();
@@ -91,7 +207,7 @@ namespace api.Controllers
                         using var content = new MemoryStream();
                         key.CopyTo(content);
                         var text = Encoding.ASCII.GetString(content.ToArray());
-                        var encryptor = new RSA(env.ContentRootPath);
+                        var encryptor = new RSA(Environment.ContentRootPath);
                         path = encryptor.EncryptFile(buffer, new Key(text), nombre);
                         if (path != "")
                         {
@@ -112,5 +228,6 @@ namespace api.Controllers
                 return StatusCode(500);
             }
         }
+
     }
 }
