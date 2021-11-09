@@ -62,7 +62,7 @@ namespace ClassLibrary.Encryptors
                 if (IsValid(key))
                 {
                     byte[] final = EncryptString(ConvertToIntList(content, key.N), key.N, key.X);
-                    string path = Path + "\\" + name + ".txt";
+                    string path = Path + "\\" + name + ".rsa";
                     using var file = new FileStream(path, FileMode.Create);
                     file.Write(final, 0, final.Length);
                     return path;
