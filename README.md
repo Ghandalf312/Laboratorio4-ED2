@@ -7,4 +7,4 @@
 ## Laboratorio 6 - Cifrado de Llave Pública
 - La branch de la solución del laboratorio 6 es ***"Lab6"***
 - El archivo .zip es generado en la carpeta "API" de la solución.
-- El archivo cifrado o descifrado, se ubica en la carperta "API" de la solución. 
+- El archivo cifrado o descifrado, es retornado en la carperta "API" de la solución. 
